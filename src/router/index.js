@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 const DevelopersView = () => import("/src/views/DevelopersView.vue");
 const GamesView = () => import("/src/views/GamesView.vue");
 const GenresView = () => import("/src/views/GenresView.vue");
+const GenresAddView = () => import("/src/views/GenresAddView.vue");
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: "/genres",
     name: "genres",
     component: GenresView,
+  },
+  {
+    path: "/genres/add",
+    name: "genres/add",
+    component: GenresAddView,
   },
   {
     path: "/:catchAll(.*)",

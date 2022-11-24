@@ -8,7 +8,7 @@ import NavigationHeader from "/src/components/NavigationHeader.vue";
     <navigation-header></navigation-header>
 
     <section
-      class="tail flex justify-center rounded-3xl bg-white p-2 drop-shadow-xl"
+      class="tail flex justify-center rounded-3xl bg-white p-6 drop-shadow-xl"
     >
       <router-view></router-view>
     </section>
