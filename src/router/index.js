@@ -1,17 +1,29 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-const HomeView = () => import("/src/views/HomeView.vue");
+const DevelopersView = () => import("/src/views/DevelopersView.vue");
+const GamesView = () => import("/src/views/GamesView.vue");
+const GenresView = () => import("/src/views/GenresView.vue");
 
 const routes = [
   {
-    path: "/",
-    name: "home",
-    component: HomeView,
+    path: "/developers",
+    name: "developers",
+    component: DevelopersView,
+  },
+  {
+    path: "/games",
+    name: "games",
+    component: GamesView,
+  },
+  {
+    path: "/genres",
+    name: "genres",
+    component: GenresView,
   },
   {
     path: "/:catchAll(.*)",
     redirect: (to) => {
-      return "/";
+      return "/developers";
     },
   },
 ];
