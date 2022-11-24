@@ -1,29 +1,31 @@
 <script setup>
 import SaveButton from "../components/SaveButton.vue";
 import CommonInputText from "../components/CommonInputText.vue";
-import { useGenreStore } from "../store/GenreStore";
+import { useDeveloperStore } from "../store/DeveloperStore";
 import { ref, computed } from "vue";
 
-const genre = ref("");
+const name = ref("");
 
 const specificErrorsMessage = computed(() => {
-  return genreStore.errors.name ? genreStore.errors.name.join(", ") : "";
+  return developerStore.errors.name
+    ? developerStore.errors.name.join(", ")
+    : "";
 });
 
-const genreStore = useGenreStore();
+const developerStore = useDeveloperStore();
 </script>
 <template>
   <form
-    @submit.prevent="genreStore.store(genre)"
+    @submit.prevent="developerStore.store(name)"
     class="flex flex-col gap-20 items-center"
   >
     <common-input-text
-      :name="'genre'"
-      :label="'Genre'"
+      :name="'name'"
+      :label="'Name'"
       :type="'text'"
-      :autocomplete="'genre'"
+      :autocomplete="'name'"
       :error="specificErrorsMessage"
-      v-model="genre"
+      v-model="name"
     ></common-input-text>
     <save-button></save-button>
   </form>

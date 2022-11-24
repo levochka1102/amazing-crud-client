@@ -3,34 +3,34 @@ import axios from "/src/api/axios";
 import { ref } from "vue";
 import router from "../router";
 
-export const useGenreStore = defineStore("GenreStore", () => {
-  const genres = ref([]);
+export const useDeveloperStore = defineStore("DeveloperStore", () => {
+  const developers = ref([]);
   const pages = ref([]);
-  const genre = ref({});
+  const developer = ref({});
   const errors = ref({});
 
-  async function index(url = "genre") {
+  async function index(url = "developer") {
     if (url === null) {
       return;
     }
 
-    genres.value = [];
+    developers.value = [];
     const response = await axios.get(url);
 
     pages.value = response.data.meta.links;
-    genres.value = response.data.data;
+    developers.value = response.data.data;
   }
 
   async function show(id) {
-    const response = await axios.get(`genre/${id}`);
-    this.genre = response.data.data;
+    const response = await axios.get(`developer/${id}`);
+    developer.value = response.data.data;
   }
 
   async function store(name) {
     try {
       errors.value = {};
-      await axios.post("genre", { name });
-      await router.push({ name: "genres" });
+      await axios.post("developer", { name });
+      await router.push({ name: "developers" });
     } catch (e) {
       console.log(e);
       if (axios.isAxiosError(e) && e.response.status === 422) {
@@ -43,10 +43,10 @@ export const useGenreStore = defineStore("GenreStore", () => {
     try {
       errors.value = {};
       if (!data) {
-        data = genre.value;
+        data = developer.value;
       }
-      await axios.put(`genre/${data.id}`, data);
-      await router.push({ name: "genres" });
+      await axios.put(`developer/${data.id}`, data);
+      await router.push({ name: "developers" });
     } catch (e) {
       if (axios.isAxiosError(e) && e.response.status === 422) {
         errors.value = e.response.data.errors;
@@ -55,14 +55,14 @@ export const useGenreStore = defineStore("GenreStore", () => {
   }
 
   async function destroy(id) {
-    await axios.delete(`genre/${id}`);
+    await axios.delete(`developer/${id}`);
     await this.index();
   }
 
   return {
-    genres,
+    developers: developers,
     pages,
-    genre,
+    developer,
     errors,
     index,
     store,

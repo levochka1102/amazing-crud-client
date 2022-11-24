@@ -3,8 +3,11 @@ import AddButton from "../components/AddButton.vue";
 import RefreshButton from "../components/RefreshButton.vue";
 import RemoveButton from "../components/RemoveButton.vue";
 import { useGenreStore } from "../store/GenreStore";
+import EditButton from "../components/EditButton.vue";
 
 const genreStore = useGenreStore();
+
+function onClickEdit(id) {}
 </script>
 <template>
   <section class="flex flex-col gap-y-10 w-full items-center">
@@ -16,18 +19,38 @@ const genreStore = useGenreStore();
       <refresh-button @on-click="genreStore.index()"></refresh-button>
     </div>
 
-    <div>
-      <ul class="grid grid-cols-4 gap-6 h-96">
-        <li
-          v-for="genre in genreStore.genres"
-          :key="genre.id"
-          class="rounded-3xl bg-teal-50 text-2xl flex items-center gap-x-8 justify-between p-2 drop-shadow-xl hover:bg-teal-100"
-        >
-          <p class="font-bold">{{ genre.id }}</p>
-          <p>{{ genre.name }}</p>
-          <remove-button></remove-button>
-        </li>
-      </ul>
+    <div class="overflow-x-auto relative shadow-md sm:rounded-lg h-[492px]">
+      <table class="w-full text-xl text-left text-gray-900">
+        <thead class="text-xl text-gray-900 uppercase bg-gray-50">
+          <tr>
+            <th scope="col" class="py-3 px-6">id</th>
+            <th scope="col" class="py-3 px-6">Name</th>
+            <th scope="col" class="py-3 px-6">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="genre in genreStore.genres" class="bg-white border-b">
+            <th
+              scope="row"
+              class="py-4 px-6 font-medium text-gray-500 whitespace-nowrap"
+            >
+              {{ genre.id }}
+            </th>
+            <td class="py-4 px-6 text-gray-900">{{ genre.name }}</td>
+            <td class="py-4 px-6 flex justify-between gap-x-4">
+              <router-link
+                :to="{ name: 'genres/edit', params: { id: genre.id } }"
+              >
+                <edit-button></edit-button>
+              </router-link>
+
+              <remove-button
+                @on-click="genreStore.destroy(genre.id)"
+              ></remove-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div>

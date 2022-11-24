@@ -2,19 +2,23 @@
 import SaveButton from "../components/SaveButton.vue";
 import CommonInputText from "../components/CommonInputText.vue";
 import { useGenreStore } from "../store/GenreStore";
-import { ref, computed } from "vue";
+import { onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 
-const genre = ref("");
+const route = useRoute();
+
+const genreStore = useGenreStore();
+const id = route.params.id;
 
 const specificErrorsMessage = computed(() => {
   return genreStore.errors.name ? genreStore.errors.name.join(", ") : "";
 });
 
-const genreStore = useGenreStore();
+onMounted(() => genreStore.show(id));
 </script>
 <template>
   <form
-    @submit.prevent="genreStore.store(genre)"
+    @submit.prevent="genreStore.update()"
     class="flex flex-col gap-20 items-center"
   >
     <common-input-text
@@ -23,7 +27,7 @@ const genreStore = useGenreStore();
       :type="'text'"
       :autocomplete="'genre'"
       :error="specificErrorsMessage"
-      v-model="genre"
+      v-model="genreStore.genre.name"
     ></common-input-text>
     <save-button></save-button>
   </form>
