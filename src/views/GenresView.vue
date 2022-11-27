@@ -2,12 +2,14 @@
 import AddButton from "../components/AddButton.vue";
 import RefreshButton from "../components/RefreshButton.vue";
 import RemoveButton from "../components/RemoveButton.vue";
-import { useGenreStore } from "../store/GenreStore";
 import EditButton from "../components/EditButton.vue";
+import { TailwindPagination } from 'laravel-vue-pagination';
+import { useGenres } from "../composables/genres";
+import SearchInput from "../components/SearchInput.vue";
 
-const genreStore = useGenreStore();
+const { data: genresData, index: getGenres, destroy: destroyGenre, search } = useGenres();
 
-function onClickEdit(id) {}
+getGenres();
 </script>
 <template>
   <section class="flex flex-col gap-y-10 w-full items-center">
@@ -16,8 +18,10 @@ function onClickEdit(id) {}
         <add-button></add-button>
       </router-link>
 
-      <refresh-button @on-click="genreStore.index()"></refresh-button>
+      <refresh-button @on-click="getGenres()"></refresh-button>
     </div>
+
+    <search-input @on-submit="getGenres" v-model="search"></search-input>
 
     <div class="overflow-x-auto relative shadow-md sm:rounded-lg h-[492px]">
       <table class="w-full text-xl text-left text-gray-900">
@@ -29,42 +33,23 @@ function onClickEdit(id) {}
           </tr>
         </thead>
         <tbody>
-          <tr v-for="genre in genreStore.genres" class="bg-white border-b">
-            <th
-              scope="row"
-              class="py-4 px-6 font-medium text-gray-500 whitespace-nowrap"
-            >
+          <tr v-for="genre in genresData.data.data" class="bg-white border-b">
+            <th scope="row" class="py-4 px-6 font-medium text-gray-500 whitespace-nowrap">
               {{ genre.id }}
             </th>
             <td class="py-4 px-6 text-gray-900">{{ genre.name }}</td>
             <td class="py-4 px-6 flex justify-between gap-x-4">
-              <router-link
-                :to="{ name: 'genres/edit', params: { id: genre.id } }"
-              >
+              <router-link :to="{ name: 'genres/edit', params: { id: genre.id } }">
                 <edit-button></edit-button>
               </router-link>
 
-              <remove-button
-                @on-click="genreStore.destroy(genre.id)"
-              ></remove-button>
+              <remove-button @on-click="destroyGenre(genre.id)"></remove-button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div>
-      <ul class="flex flex-wrap gap-6">
-        <li v-for="page in genreStore.pages">
-          <button
-            @click="genreStore.index(page.url)"
-            :class="{ 'pointer-events-none bg-teal-500': page.active }"
-            class="text-2xl p-6 bg-teal-600 hover:bg-teal-500 rounded-full active:rotate-12 transition-all text-white"
-          >
-            {{ page.label }}
-          </button>
-        </li>
-      </ul>
-    </div>
+    <tailwind-pagination :limit="50" :data="genresData.data" @pagination-change-page="getGenres" />
   </section>
 </template>

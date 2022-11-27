@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useGenreStore } from "/src/store/GenreStore";
-import { useDeveloperStore } from "/src/store/DeveloperStore";
 
 const GenresView = () => import("/src/views/GenresView.vue");
 const GenresAddView = () => import("/src/views/GenresAddView.vue");
@@ -11,16 +9,14 @@ const DevelopersAddView = () => import("/src/views/DevelopersAddView.vue");
 const DevelopersEditView = () => import("/src/views/DevelopersEditView.vue");
 
 const GamesView = () => import("/src/views/GamesView.vue");
+const GamesAddView = () => import("/src/views/GamesAddView.vue");
+const GamesEditView = () => import("/src/views/GamesEditView.vue");
 
 const routes = [
   {
     path: "/genres",
     name: "genres",
     component: GenresView,
-    beforeEnter: (to, from) => {
-      const genreStore = useGenreStore();
-      genreStore.index();
-    },
   },
   {
     path: "/genres/add",
@@ -36,10 +32,6 @@ const routes = [
     path: "/developers",
     name: "developers",
     component: DevelopersView,
-    beforeEnter: (to, from) => {
-      const developerStore = useDeveloperStore();
-      developerStore.index();
-    },
   },
   {
     path: "/developers/add",
@@ -55,6 +47,16 @@ const routes = [
     path: "/games",
     name: "games",
     component: GamesView,
+  },
+  {
+    path: "/games/add",
+    name: "games/add",
+    component: GamesAddView,
+  },
+  {
+    path: "/games/edit/:id",
+    name: "games/edit",
+    component: GamesEditView,
   },
   // {
   //   path: "/:catchAll(.*)",
