@@ -4,12 +4,11 @@ import RefreshButton from "../components/RefreshButton.vue";
 import RemoveButton from "../components/RemoveButton.vue";
 import EditButton from "../components/EditButton.vue";
 import { TailwindPagination } from 'laravel-vue-pagination';
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useGenres } from "../composables/genres";
 import { useGames } from "../composables/games";
 import { useDevelopers } from "../composables/developers";
 import SearchInput from "../components/SearchInput.vue";
-import DropDown from "../components/DropDown.vue";
 
 const toggleGenreDropdown = ref(false);
 const toggleDeveloperDropdown = ref(false);
