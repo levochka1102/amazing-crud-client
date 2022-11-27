@@ -1,8 +1,6 @@
-# Vue 3 + Vite
+1. git clone git@github.com:levochka1102/amazing-crud-client.git
+2. npm i
+3. npm run build
+4. npm run preview
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-# amazing-crud-client
+If you started the laravel server on port different from 8000, you may specify it /src/api/axios.js
