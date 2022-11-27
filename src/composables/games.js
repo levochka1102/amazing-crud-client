@@ -13,6 +13,7 @@ export function useGames() {
     const perPageLimit = 15;
 
     const index = async (page = 1, limit = perPageLimit) => {
+        console.log(search.value);
         const response = await axios.get(`${url}`, {
             params: {
                 limit, search: search.value, page, genres_ids: joinGamesIds(), developers_ids: joinGamesIds(selectedDevelopers.value)

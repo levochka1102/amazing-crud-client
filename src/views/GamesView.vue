@@ -9,6 +9,7 @@ import { useGenres } from "../composables/genres";
 import { useGames } from "../composables/games";
 import { useDevelopers } from "../composables/developers";
 import SearchInput from "../components/SearchInput.vue";
+import DropDown from "../components/DropDown.vue";
 
 const toggleGenreDropdown = ref(false);
 const toggleDeveloperDropdown = ref(false);
@@ -192,7 +193,7 @@ getDevelopers();
               {{ game.id }}
             </th>
             <td class="py-4 px-6 text-gray-900">{{ game.name }}</td>
-            <td class="py-4 px-6 text-gray-900">{{ game.developer.name }}</td>
+            <td class="py-4 px-6 text-gray-900">{{ game.developer?.name }}</td>
             <td class="py-4 px-6 text-gray-900">
               {{
                   game.genres.data.reduce(function (a, b) {
