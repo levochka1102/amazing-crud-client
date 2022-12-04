@@ -3,34 +3,48 @@ import { ref } from "vue";
 import router from "../router";
 
 export function useGames() {
-    const data = ref({});
+    const data = ref([]);
+    const parameters = ref({
+        limit: 15,
+        search: '',
+        name: '',
+        genres: [],
+        developer: {
+            name: ''
+        },
+        developers: [],
+    });
     const errors = ref({});
     const game = ref({});
-    const url = "game";
     const search = ref('');
-    const selectedGenres = ref([]);
-    const selectedDevelopers = ref([]);
-    const perPageLimit = 15;
+    const url = "games";
 
-    const index = async (page = 1, limit = perPageLimit) => {
-        console.log(search.value);
-        const response = await axios.get(`${url}`, {
+    const index = async (page = 1) => {
+        const { limit, search, genres, developers } = parameters.value;
+
+        const response = await axios.get(`${url}?${parseModelsToUrl(genres, 'genres')}&${parseModelsToUrl(developers, 'developers')}`, {
             params: {
-                limit, search: search.value, page, genres_ids: joinGamesIds(), developers_ids: joinGamesIds(selectedDevelopers.value)
+                page,
+                limit,
+                search,
             }
         });
+
         data.value = await response;
     }
 
     const show = async (id) => {
         const response = await axios.get(`${url}/${id}`);
-        game.value = await response.data.data;
+        game.value = await response.data;
     }
 
-    const store = async (options) => {
+    const store = async () => {
+        const { name, genres, developer } = parameters.value;
+
         try {
             errors.value = {};
-            await axios.post(url, options);
+            await axios.post(`${url}?${parseModelsToUrl(genres, 'genres')}`,
+                { name, developer: developer.id });
             await router.push({ name: "games" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
@@ -39,14 +53,15 @@ export function useGames() {
         }
     }
 
-    const update = async (options) => {
+    const update = async () => {
+        const { name, genres, developer } = parameters.value;
+
         try {
             errors.value = {};
-            const response = await axios.put(`${url}/${game.value.id}`, options);
+            await axios.put(`${url}/${game.value.id}?${parseModelsToUrl(genres, 'genres')}`,
+                { name, developer: developer.id });
             await router.push({ name: "games" });
-            console.log(response);
         } catch (e) {
-            console.log(e);
             if (axios.isAxiosError(e) && e.response.status === 422) {
                 errors.value = e.response.data.errors;
             }
@@ -58,15 +73,22 @@ export function useGames() {
         await index();
     }
 
-    const joinGamesIds = (array = selectedGenres.value) => {
-        return array.reduce(function (a, b) {
-            return a + ["", ", "][+!!a.length] + b.id;
-        }, "")
+    const parseModelsToUrl = (model, name) => {
+        if (model.length === 0) {
+            return name;
+        }
+
+        let i = 0;
+        let array = [];
+        model.forEach(el => array.push(`${name}[${i++}][id]=${el.id}`));
+
+        return array.join('&');
     }
 
     return {
-        search,
         data,
+        search,
+        parameters,
         game,
         errors,
         index,
@@ -74,8 +96,5 @@ export function useGames() {
         show,
         update,
         destroy,
-        selectedGenres,
-        joinGamesIds,
-        selectedDevelopers,
     };
 };
