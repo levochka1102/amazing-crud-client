@@ -1,6 +1,7 @@
 import axios from "/src/api/axios";
 import { ref } from "vue";
 import router from "../router";
+import { useErrorStore } from "../store/ErrorStore"
 
 export function useGames() {
     const data = ref([]);
@@ -14,7 +15,7 @@ export function useGames() {
         },
         developers: [],
     });
-    const errors = ref({});
+    const errorStore = useErrorStore();
     const game = ref({});
     const search = ref('');
     const url = "games";
@@ -42,13 +43,13 @@ export function useGames() {
         const { name, genres, developer } = parameters.value;
 
         try {
-            errors.value = {};
-            await axios.post(`${url}?${parseModelsToUrl(genres, 'genres')}`,
+            const response = await axios.post(`${url}?${parseModelsToUrl(genres, 'genres')}`,
                 { name, developer: developer.id });
+            console.log(response);
             await router.push({ name: "games" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
@@ -57,13 +58,12 @@ export function useGames() {
         const { name, genres, developer } = parameters.value;
 
         try {
-            errors.value = {};
             await axios.put(`${url}/${game.value.id}?${parseModelsToUrl(genres, 'genres')}`,
                 { name, developer: developer.id });
             await router.push({ name: "games" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
@@ -90,7 +90,6 @@ export function useGames() {
         search,
         parameters,
         game,
-        errors,
         index,
         store,
         show,

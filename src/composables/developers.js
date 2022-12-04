@@ -1,14 +1,15 @@
 import axios from "/src/api/axios";
 import { ref } from "vue";
 import router from "../router";
+import { useErrorStore } from "../store/ErrorStore"
 
 export function useDevelopers() {
     const data = ref({});
-    const errors = ref({});
+    const errorStore = useErrorStore();
     const developer = ref({});
     const search = ref('');
     const perPageLimit = 6
-    const url = "developer";
+    const url = "developers";
 
     const all = async () => {
         const response = await axios.get(`${url}/all`, { params: { search: search.value } });
@@ -28,38 +29,42 @@ export function useDevelopers() {
 
     const store = async (options) => {
         try {
-            errors.value = {};
-            await axios.post(url, options);
+            const response = await axios.post(url, options);
+            console.log(response);
             await router.push({ name: "developers" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
 
     const update = async () => {
         try {
-            errors.value = {};
             await axios.put(`${url}/${developer.value.id}`, developer.value);
             await router.push({ name: "developers" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
 
     const destroy = async (id) => {
-        await axios.delete(`${url}/${id}`);
-        await index();
+        try {
+            await axios.delete(`${url}/${id}`);
+            await index();
+        } catch (e) {
+            if (axios.isAxiosError(e) && e.response.status === 422) {
+                errorStore.errors = e.response.data;
+            }
+        }
     }
 
     return {
         all,
         data,
         developer,
-        errors,
         index,
         store,
         show,

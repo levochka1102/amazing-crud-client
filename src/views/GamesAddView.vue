@@ -9,16 +9,12 @@ import { useDevelopers } from "../composables/developers";
 const toggleDeveloperChooser = ref(false);
 const toggleGenreChooser = ref(false);
 
-const { errors, store: storeGame, parameters: gamesParameters } = useGames();
+const { store: storeGame, parameters: gamesParameters } = useGames();
 const { data: genresData, all: getGenres, search: searchGenre } = useGenres();
 const { data: developersData, all: getDevelopers, search: searchDeveloper } = useDevelopers();
 
 getGenres();
 getDevelopers();
-
-const specificErrorsMessage = computed(() => {
-  return errors.value.name ? errors.value.name.join(", ") : "";
-});
 
 function onClickDeveloperChooser() {
   toggleDeveloperChooser.value = !toggleDeveloperChooser.value;
@@ -44,33 +40,37 @@ function isCheckedGenre(genre) {
   return false;
 }
 
-const computeGenresList = computed(() => {
-  if (gamesParameters.value.genres.length !== 0) {
-    var genres = gamesParameters.value.genres.map(function (genre) {
-      return genre['name'];
-    });
-    return genres.join(", ");
-  }
-  return "";
-});
+function removeGenre(genre) {
+  const index = gamesParameters.value.genres.findIndex((object) => { return object.id === genre.id });
+  gamesParameters.value.genres.splice(index, 1);
+}
 
 function onSubmit() {
   storeGame();
 }
 </script>
+
 <template>
   <div>
     <div class="mb-10">
       <h1 class="text-4xl">Choosed Game Options:</h1>
       <div class="flex flex-col gap-y-2 text-2xl font-medium text-gray-600">
-        <p><b>Name:</b> {{ gamesParameters.name }}</p>
-        <p><b>Developer:</b> {{ gamesParameters.developer.name }}</p>
-        <p><b>Genres:</b> {{ computeGenresList }}</p>
+        <p><b>Name: </b>{{ gamesParameters.name }}</p>
+        <p><b>Developer: </b>{{ gamesParameters.developer.name }}</p>
+        <div>
+          <b>Genres: </b>
+          <span v-for="genre in gamesParameters.genres" class="ml-2">
+            <button @click="removeGenre(genre)"
+              class="border-2 border-gray-600 rounded-full p-2 hover:bg-gray-600 hover:text-white">
+              {{ genre.name }} &#10006
+            </button>
+          </span>
+        </div>
       </div>
     </div>
     <form @submit.prevent="onSubmit()" class="flex flex-col gap-20 items-center">
       <common-input-text :name="'name'" :label="'Name'" :type="'text'" :autocomplete="'name'"
-        :error="specificErrorsMessage" v-model="gamesParameters.name"></common-input-text>
+        v-model="gamesParameters.name"></common-input-text>
 
       <div class="">
         <button id="dropdownSearchButton" data-dropdown-toggle="dropdownSearch" data-dropdown-placement="bottom"

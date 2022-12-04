@@ -12,13 +12,9 @@ const toggleGenreChooser = ref(false);
 const route = useRoute();
 const id = route.params.id;
 
-const { errors, update: updateGame, parameters: gamesParamters, show: showGame, game } = useGames();
+const { update: updateGame, parameters: gamesParameters, show: showGame, game } = useGames();
 const { data: genresData, all: getGenres, search: searchGenre } = useGenres();
 const { data: developersData, all: getDevelopers, search: searchDeveloper } = useDevelopers();
-
-const specificErrorsMessage = computed(() => {
-  return errors.value.name ? errors.value.name.join(", ") : "";
-});
 
 function onClickDeveloperChooser() {
   toggleDeveloperChooser.value = !toggleDeveloperChooser.value;
@@ -36,7 +32,7 @@ function onClickGenreChooser() {
 }
 
 function isCheckedGenre(genre) {
-  for (const selectedGenre in gamesParamters.value.genres) {
+  for (const selectedGenre in gamesParameters.value.genres) {
     if (selectedGenre.name === genre.name) {
       return true;
     }
@@ -44,15 +40,10 @@ function isCheckedGenre(genre) {
   return false;
 }
 
-const genresList = computed(() => {
-  if (gamesParamters.value.genres.length !== 0) {
-    var genres = gamesParamters.value.genres.map(function (genre) {
-      return genre['name'];
-    });
-    return genres.join(", ");
-  }
-  return "";
-});
+function removeGenre(genre) {
+  const index = gamesParameters.value.genres.findIndex((object) => { return object.id === genre.id });
+  gamesParameters.value.genres.splice(index, 1);
+}
 
 function onSubmit() {
   updateGame();
@@ -60,9 +51,9 @@ function onSubmit() {
 
 onMounted(async function () {
   await showGame(id);
-  gamesParamters.value.name = await game.value.name;
-  gamesParamters.value.developer = await game.value.developer;
-  gamesParamters.value.genres = await game.value.genres.data;
+  gamesParameters.value.name = await game.value.name;
+  gamesParameters.value.developer = await game.value.developer;
+  gamesParameters.value.genres = await game.value.genres.data;
 
   getGenres();
   getDevelopers();
@@ -73,14 +64,22 @@ onMounted(async function () {
     <div class="mb-10">
       <h1 class="text-4xl">Choosed Game Options:</h1>
       <div class="flex flex-col gap-y-2 text-2xl font-medium text-gray-600">
-        <p><b>Name:</b> {{ gamesParamters.name }}</p>
-        <p><b>Developer:</b> {{ gamesParamters.developer.name }}</p>
-        <p><b>Genres:</b> {{ genresList }}</p>
+        <p><b>Name:</b> {{ gamesParameters.name }}</p>
+        <p><b>Developer:</b> {{ gamesParameters.developer.name }}</p>
+        <div>
+          <b>Genres: </b>
+          <span v-for="genre in gamesParameters.genres" class="ml-2">
+            <button @click="removeGenre(genre)"
+              class="border-2 border-gray-600 rounded-full p-2 hover:bg-gray-600 hover:text-white">
+              {{ genre.name }} &#10006
+            </button>
+          </span>
+        </div>
       </div>
     </div>
     <form @submit.prevent="onSubmit()" class="flex flex-col gap-20 items-center">
       <common-input-text :name="'name'" :label="'Name'" :type="'text'" :autocomplete="'name'"
-        :error="specificErrorsMessage" v-model="gamesParamters.name"></common-input-text>
+        v-model="gamesParameters.name"></common-input-text>
 
       <div class="">
         <button id="dropdownSearchButton" data-dropdown-toggle="dropdownSearch" data-dropdown-placement="bottom"
@@ -115,8 +114,8 @@ onMounted(async function () {
           <ul class="overflow-y-auto px-3 pb-3 h-56 text-sm text-gray-700" aria-labelledby="dropdownSearchButton">
             <li v-for="developer in developersData.data.data">
               <div class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-                <input :checked="developer.name === gamesParamters.developer.name" type="radio" :value="developer"
-                  v-model="gamesParamters.developer"
+                <input :checked="developer.name === gamesParameters.developer.name" type="radio" :value="developer"
+                  v-model="gamesParameters.developer"
                   class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
                 <label for="checkbox-item-11"
                   class="py-2 ml-2 w-full text-sm font-medium text-gray-900 rounded dark:text-gray-300">{{
@@ -125,7 +124,7 @@ onMounted(async function () {
               </div>
             </li>
           </ul>
-          <button type="button" @click="gamesParamters.developer = {}"
+          <button type="button" @click="gamesParameters.developer = {}"
             class="p-3 text-sm font-medium text-red-600 w-full text-center bg-gray-50 border-t border-gray-200 dark:border-gray-600 hover:bg-gray-100 hover:underline">
             Clear
           </button>
@@ -165,7 +164,7 @@ onMounted(async function () {
           <ul class="overflow-y-auto px-3 pb-3 h-56 text-sm text-gray-700" aria-labelledby="dropdownSearchButton">
             <li v-for="genre in genresData.data.data">
               <div class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-                <input :checked="isCheckedGenre(genre)" type="checkbox" :value="genre" v-model="gamesParamters.genres"
+                <input :checked="isCheckedGenre(genre)" type="checkbox" :value="genre" v-model="gamesParameters.genres"
                   class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
                 <label for="checkbox-item-11"
                   class="py-2 ml-2 w-full text-sm font-medium text-gray-900 rounded dark:text-gray-300">{{
@@ -174,7 +173,7 @@ onMounted(async function () {
               </div>
             </li>
           </ul>
-          <button type="button" @click="gamesParamters.genres = []"
+          <button type="button" @click="gamesParameters.genres = []"
             class="p-3 text-sm font-medium text-red-600 w-full text-center bg-gray-50 border-t border-gray-200 dark:border-gray-600 hover:bg-gray-100 hover:underline">
             Clear
           </button>

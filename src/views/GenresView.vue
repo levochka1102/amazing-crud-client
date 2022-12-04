@@ -7,7 +7,7 @@ import { TailwindPagination } from 'laravel-vue-pagination';
 import { useGenres } from "../composables/genres";
 import SearchInput from "../components/SearchInput.vue";
 
-const { data: genresData, index: getGenres, destroy: destroyGenre, search } = useGenres();
+const { data: genresData, index: getGenres, destroy: destroyGenre, search, errors } = useGenres();
 
 getGenres();
 </script>
@@ -36,8 +36,9 @@ getGenres();
           <tr v-for="genre in genresData.data.data" class="bg-white border-b">
             <th scope="row" class="py-4 px-6 font-medium text-gray-500 whitespace-nowrap">
               {{ genre.id }}
+
             </th>
-            <td class="py-4 px-6 text-gray-900">{{ genre.name }}</td>
+            <td class="py-4 px-6 text-gray-900">{{ genre.name }} </td>
             <td class="py-4 px-6 flex justify-between gap-x-4">
               <router-link :to="{ name: 'genres/edit', params: { id: genre.id } }">
                 <edit-button></edit-button>

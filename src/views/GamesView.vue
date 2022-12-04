@@ -13,12 +13,11 @@ import SearchInput from "../components/SearchInput.vue";
 const toggleGenreDropdown = ref(false);
 const toggleDeveloperDropdown = ref(false);
 
-const { data: gamesData, index: getGames, destroy: destroyGame, selectedGenres, search: searchGames, selectedDevelopers } = useGames()
+const { data: gamesData, parameters: gamesParameters, index: getGames, destroy: destroyGame } = useGames()
 const { data: genresData, all: getGenres, search: searchGenres } = useGenres()
 const { data: developersData, all: getDevelopers, search: searchDeveloper } = useDevelopers();
 
 function onClickDropdownMenuButton() {
-  // getAllGenres();
   toggleGenreDropdown.value = !toggleGenreDropdown.value;
 }
 
@@ -27,7 +26,7 @@ function onAcceptDropdownGenres() {
 }
 
 function onClearDropdownGenres() {
-  selectedGenres.value = [];
+  gamesParameters.value.genres = [];
   getGames();
 }
 
@@ -36,12 +35,12 @@ function onAcceptDropdownDevelopers() {
 }
 
 function onClearDropdownDevelopers() {
-  selectedDevelopers.value = [];
+  gamesParameters.value.developers = [];
   getGames();
 }
 
 function onUpdate() {
-  selectedGenres.value = [];
+  gamesParameters.value.genres = [];
   getGames();
 }
 
@@ -49,6 +48,7 @@ getGames();
 getGenres();
 getDevelopers();
 </script>
+
 <template>
   <section class="flex flex-col gap-y-10 w-full items-center">
     <div class="flex justify-around w-full">
@@ -59,7 +59,7 @@ getDevelopers();
       <refresh-button @on-click="onUpdate()"></refresh-button>
     </div>
 
-    <search-input @on-submit="getGames" v-model="searchGames"></search-input>
+    <search-input @on-submit="getGames" v-model="gamesParameters.search"></search-input>
 
     <div class="overflow-x-auto relative shadow-md sm:rounded-lg h-[492px]">
       <table class="w-full text-xl text-left text-gray-900">
@@ -111,7 +111,7 @@ getDevelopers();
                     aria-labelledby="dropdownSearchButton">
                     <li v-for="developer in developersData.data.data">
                       <div class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-                        <input type="checkbox" :value="developer" v-model="selectedDevelopers"
+                        <input type="checkbox" :value="developer" v-model="gamesParameters.developers"
                           class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
                         <label for="checkbox-item-11"
                           class="py-2 ml-2 w-full text-sm font-medium text-gray-900 rounded dark:text-gray-300">{{
@@ -164,7 +164,7 @@ getDevelopers();
                 <ul class="overflow-y-auto px-3 pb-3 h-56 text-sm text-gray-700" aria-labelledby="dropdownSearchButton">
                   <li v-for="genre in genresData.data.data">
                     <div class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-                      <input :id="genre.id" type="checkbox" :value="genre" v-model="selectedGenres"
+                      <input :id="genre.id" type="checkbox" :value="genre" v-model="gamesParameters.genres"
                         class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
                       <label for="checkbox-item-11"
                         class="py-2 ml-2 w-full text-sm font-medium text-gray-900 rounded dark:text-gray-300">{{

@@ -1,18 +1,18 @@
 import axios from "/src/api/axios";
 import { ref } from "vue";
 import router from "../router";
+import { useErrorStore } from "../store/ErrorStore"
 
 export function useGenres() {
     const data = ref({});
-    const errors = ref({});
+    const errorStore = useErrorStore();
     const genre = ref({});
     const search = ref('');
     const perPageLimit = 6
-    const url = "genre";
+    const url = "genres";
 
     const all = async () => {
         const response = await axios.get(`${url}/all`, { params: { search: search.value } });
-        console.log(response);
         data.value = await response;
     }
 
@@ -28,38 +28,41 @@ export function useGenres() {
 
     const store = async (options) => {
         try {
-            errors.value = {};
             await axios.post(url, options);
             await router.push({ name: "genres" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
 
     const update = async () => {
         try {
-            errors.value = {};
             await axios.put(`${url}/${genre.value.id}`, genre.value);
             await router.push({ name: "genres" });
         } catch (e) {
             if (axios.isAxiosError(e) && e.response.status === 422) {
-                errors.value = e.response.data.errors;
+                errorStore.errors = e.response.data;
             }
         }
     }
 
     const destroy = async (id) => {
-        await axios.delete(`${url}/${id}`);
-        await index();
+        try {
+            await axios.delete(`${url}/${id}`);
+            await index();
+        } catch (e) {
+            if (axios.isAxiosError(e) && e.response.status === 422) {
+                errorStore.errors = e.response.data;
+            }
+        }
     }
 
     return {
         all,
         data,
         genre,
-        errors,
         index,
         store,
         show,
